@@ -1,0 +1,19 @@
+plugins{
+
+    id 'application'
+}
+group ='com.flashwallet'
+version='1.0'
+
+sourceCompatibility ='17'
+repositories{
+    mavenCentral()
+}
+application{
+    mainClassName='Main'
+}
+java{
+    toolchain{
+        languageVersion=JavaLanguageVersion.of(17)
+    }
+}
