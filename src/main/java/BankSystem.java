@@ -3,22 +3,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BankSystem {
-    private List<Account> accounts;
-
-    public BankSystem() {
-        try {
-            this.accounts = FileManager.loadAccounts();
-        } catch (IOException e) {
-            System.out.println(" Error loading accounts: " + e.getMessage());
-            this.accounts = new ArrayList<>();
-        }
+    private static List<Account> accounts;
+    public BankSystem(){
+        this.accounts = new ArrayList<>();
+    }
+    public BankSystem(List<Account> accounts) {
+        this.accounts = accounts;
     }
 
     public List<Account> getAllAccounts() {
         return accounts;
     }
 
-    public Account getAccountById(String id) {
+    public static Account getAccountById(String id) {
         for (Account acc : accounts) {
             if (acc.getId().equals(id)) {
                 return acc;
@@ -78,5 +75,47 @@ public class BankSystem {
         } else {
             System.out.println("Account not found.");
         }
+    }
+
+
+
+        public static boolean deposit(String accId, double amount) {
+            Account acc = getAccountById(accId);
+            if (acc != null) {
+                acc.setBalance(acc.getBalance() + amount);
+                saveAccounts();
+                return true;
+            }
+            return false;
+        }
+    private static void saveAccounts() {
+        try {
+            FileManager.saveAccounts(accounts);
+        } catch (IOException e) {
+            System.out.println("Error saving accounts: " + e.getMessage());
+
+        }
+    }
+
+
+    public static boolean withdraw(String accId, double amount) throws IOException {
+            Account acc = getAccountById(accId);
+            if (acc != null && acc.getBalance() >= amount) {
+                acc.setBalance(acc.getBalance() - amount);
+                try {
+                    FileManager.saveAccounts(accounts);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                return true;
+            }
+            return false;
+        }
+
+
+
+
+    public void setAccounts(List<Account> accounts) {
+        this.accounts = accounts;
     }
 }

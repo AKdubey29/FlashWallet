@@ -8,6 +8,15 @@ public class SyncService implements Runnable {
         System.out.println("Syncing offline transactions...");
 
         BankSystem bankSystem = new BankSystem();
+        try {
+            List<Account> accounts = FileManager.loadAccounts();
+            bankSystem.setAccounts(accounts);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
         List<Transaction> offlineTxns;
 
         try {
@@ -39,18 +48,20 @@ public class SyncService implements Runnable {
                 from.setBalance(from.getBalance() - txn.getAmount());
                 to.setBalance(to.getBalance() + txn.getAmount());
                 successCount++;
+                try {
+                    FileManager.saveAccounts(bankSystem.getAllAccounts());
+                } catch (IOException e) {
+                    System.out.println(" Failed to save updated accounts: " + e.getMessage());
+                    return;
+                }
             } else {
                 System.out.println(" Insufficient funds for transaction: " + txn);
                 failCount++;
             }
+
         }
 
-        try {
-            FileManager.saveAccounts(bankSystem.getAllAccounts());
-        } catch (IOException e) {
-            System.out.println(" Failed to save updated accounts: " + e.getMessage());
-            return;
-        }
+
 
         System.out.println(" Sync Complete: " + successCount + " successful, " + failCount + " failed.");
     }

@@ -41,7 +41,10 @@ public class FileManager {
             writer.write(acc.getId() + "," + acc.getName() + "," + acc.getBalance());
             writer.newLine();
         }
+        writer.flush();
+        System.out.println("files flushed");
         writer.close();
+
     }
 
     // Add a transaction to offline queue
@@ -55,6 +58,7 @@ public class FileManager {
         BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
         writer.write(txn.getFromId() + "," + txn.getToId() + "," + txn.getAmount());
         writer.newLine();
+        writer.flush();
         writer.close();
     }
 
@@ -87,4 +91,16 @@ public class FileManager {
 
         return transactions;
     }
+
+    private static final String OFFLINE_QUEUE_FILE = "offline_queue.txt";
+
+    // Other existing methods...
+
+    public static void clearOfflineTransactions() throws IOException {
+        // Open the file in write mode without appending (overwrite it)
+        try (FileWriter writer = new FileWriter(OFFLINE_QUEUE_FILE, false)) {
+            writer.write("");  // Write nothing (clears the file)
+  }
+}
+
 }
